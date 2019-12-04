@@ -11,6 +11,8 @@ module.exports = {
       unidade: DataTypes.STRING,
       prefixo: DataTypes.STRING,
       modelo: DataTypes.STRING,		
+      tipo_operacional: DataTypes.STRING,
+      ano_operacao: DataTypes.INTEGER,
     },
     {
       freezeTableName: true,
