@@ -8,10 +8,13 @@ module.exports = {
         primaryKey: true,
         autoincrement: true
       },
-      questionarios_respostas_id: DataTypes.INTEGER,
+      questionarios_pergunta_id: DataTypes.INTEGER,
+      email: DataTypes.STRING,
+      unidade: DataTypes.STRING,
+      funcao: DataTypes.STRING,      
       resposta_escolha: DataTypes.STRING,
       resposta_texto: DataTypes.STRING,
-      funcao: DataTypes.STRING,      
+      data_resposta: DataTypes.DATE,
     },
     {
       freezeTableName: true,

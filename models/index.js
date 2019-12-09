@@ -21,7 +21,7 @@ fs
     return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
   })
   .forEach(file => {
-    const model = sequelize['import'](path.join(__dirname, file));
+    const model = sequelize['import'](path.join(__dirname, file));    
     db[model.name] = model;
   });
 
@@ -33,5 +33,19 @@ Object.keys(db).forEach(modelName => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
+//Relations
+db.ps_questionarios_viaturas.belongsTo(db.ps_viaturas, { foreignKey: 'viatura_id' });
+db.ps_viaturas.hasMany(db.ps_questionarios_viaturas, { foreignKey: 'viatura_id' });
+db.ps_questionarios_viaturas.belongsTo(db.ps_questionarios, { foreignKey: 'questionario_id' });
+db.ps_questionarios.hasMany(db.ps_questionarios_viaturas, { foreignKey: 'questionario_id' });
+db.ps_questionarios_perguntas.belongsTo(db.ps_perguntas, { foreignKey: 'pergunta_id' });
+db.ps_perguntas.hasMany(db.ps_questionarios_perguntas, { foreignKey: 'pergunta_id' });
+db.ps_perguntas.belongsTo(db.ps_tipo_perguntas, { foreignKey: 'tipo_pergunta_id' });
+db.ps_tipo_perguntas.hasOne(db.ps_perguntas, { foreignKey: 'tipo_pergunta_id' });
+db.ps_perguntas_respostas.belongsTo(db.ps_perguntas, { foreignKey: 'pergunta_id' });
+db.ps_perguntas_respostas.belongsTo(db.ps_respostas, { foreignKey: 'resposta_id' });
+db.ps_perguntas.hasMany(db.ps_perguntas_respostas, { foreignKey: 'pergunta_id' });
+db.ps_respostas.hasMany(db.ps_perguntas_respostas, { foreignKey: 'resposta_id' });
 
 module.exports = db;
