@@ -44,7 +44,7 @@ module.exports = (app, db, route) => {
 						]
 					}
 				]
-			}).then((result) => res.status(201).json(result))
+			}).then((data) => res.status(201).json(data))
 		} catch (err) {
 			res.status(500).json({ message: err.message })
 		}
@@ -95,6 +95,45 @@ module.exports = (app, db, route) => {
 	app.get(`/${route}/:id`, (req, res) => {
 		try {
 			res.status(201).json("Selecao pelo ID");
+		} catch (err) {
+			res.status(500).json({ message: err.message })
+		}
+	})
+
+	app.post(`/${route}/responder`, (req, res) => {
+		try {
+			console.log(req.body);
+			let resposta = req.body;
+			// Salva as resposta enviadas
+			for(let pergunta_id of Object.keys(resposta.respostas)) {
+				db.ps_questionarios_perguntas_respostas.create({
+					questionario_id: resposta.questionario_id,
+					viatura_id: resposta.viatura_id,
+					pergunta_id: pergunta_id,
+					funcao: resposta.funcao,
+					unidade: resposta.unidade,
+					email: resposta.email,
+					data_resposta: new Date(),
+					resposta_id: (resposta.respostas[pergunta_id].tipo != 'TEXTO') ? resposta.respostas[pergunta_id].valor : 0,
+					resposta_texto: (resposta.respostas[pergunta_id].tipo == 'TEXTO') ? resposta.respostas[pergunta_id].valor : '',
+				});
+			}
+			res.status(201).json(1);
+		} catch (err) {
+			res.status(500).json({ message: err.message })
+		}
+	})
+
+	app.get(`/${route}/respondidas/:email/:unidade/:funcao`, (req, res) => {
+		try {
+			let sql = `select distinct c.*, date(a.data_resposta) data_resposta, a.email, a.unidade opm, a.funcao
+						from ps_questionarios_perguntas_respostas a
+						join ps_viaturas c on a.viatura_id = c.id
+						where a.email = '${req.params.email}' and a.unidade = '${req.params.unidade}' and a.funcao = '${req.params.funcao}'`;
+			db.sequelize.query(sql, { type: db.sequelize.QueryTypes.SELECT}).then(data => {
+				// We don't need spread here, since only the results will be returned for select queries
+				res.status(201).json(data);
+  			})
 		} catch (err) {
 			res.status(500).json({ message: err.message })
 		}
